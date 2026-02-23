@@ -1,27 +1,71 @@
-import React, { useEffect, useRef } from 'react'
-import dp from "../assets/dp.jpeg"
-import { useSelector } from 'react-redux'
-function SenderMessage({ image, message }) {
-  let { userData } = useSelector(state => state.user)
-  let scroll = useRef()
+import React, { useEffect, useRef } from "react";
+import dp from "../assets/dp.jpeg";
+import { useSelector } from "react-redux";
+import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
+
+function SenderMessage({ image, message, createdAt, status = "delivered" }) {
+  const { userData } = useSelector((state) => state.user);
+  const scrollRef = useRef();
+
   useEffect(() => {
-    scroll?.current.scrollIntoView({ behavior: "smooth" })
-  }, [message, image])
-  const handleImageScroll = () => {
-    scroll?.current.scrollIntoView({ behavior: "smooth" })
-  }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message, image]);
+
+  const formatTime = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return d.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
-    <div className='flex items-start gap-[10px]' >
-      
-      <div ref={scroll} className='w-fit max-w-[500px] px-[20px] py-[10px] bg-[#1797c2] text-white text-[19px] rounded-tr-none rounded-2xl relative right-0 ml-auto shadow-gray-400 shadow-lg gap-[10px] flex flex-col'>
-        {image && <img src={image} alt="" className='w-[150px] rounded-lg' onLoad={handleImageScroll} />}
-        {message && <span  > {message}</span>}
+    <div
+      ref={scrollRef}
+      className="flex justify-end items-end gap-3 animate-slideUp"
+    >
+      {/* Message Bubble */}
+      <div className="relative max-w-[85%] bg-[#1797c2] text-white px-6 py-4 rounded-3xl rounded-br-md shadow-md">
+
+        {image && (
+          <img
+            src={image}
+            alt=""
+            className="w-56 rounded-xl mb-2"
+          />
+        )}
+
+        {/* Message + Inline Time */}
+        <div className="flex items-end justify-between gap-3">
+          <span className="text-lg leading-relaxed break-words">
+            {message}
+          </span>
+
+          <span className="flex items-center gap-1 text-sm text-white/80 whitespace-nowrap">
+            {formatTime(createdAt)}
+
+            {status === "sent" && (
+              <IoCheckmark className="text-base text-white/70" />
+            )}
+
+            {status === "delivered" && (
+              <IoCheckmarkDone className="text-base text-white/70" />
+            )}
+          </span>
+        </div>
       </div>
-      <div className='w-[30px] h-[30px] rounded-full  overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg ' >
-        <img src={userData.image || dp} alt="" className='h-[100%]' />
+
+      {/* Avatar */}
+      <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm">
+        <img
+          src={userData?.image || dp}
+          alt=""
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
-  )
+  );
 }
 
-export default SenderMessage
+export default SenderMessage;
